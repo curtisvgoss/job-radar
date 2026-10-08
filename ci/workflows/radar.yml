@@ -1,0 +1,86 @@
+# Instance workflow template: copy to .github/workflows/radar.yml in your private instance repo.
+# The engine is installed from config.yml: engine_repo (owner/name) at engine_sha (a full 40-char
+# commit, never a tag or branch). Every action is pinned to a full commit SHA.
+name: radar
+
+on:
+  schedule:
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+    inputs:
+      drill:
+        description: "Credential drill (none = normal run)"
+        type: choice
+        options: [none, key-rejected, expiring]
+        default: none
+      compile_profile:
+        description: "Run --compile-profile before the run (after editing profile.yml)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: radar
+  cancel-in-progress: false
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: false
+
+      - name: Install engine at pinned commit
+        run: |
+          repo=$(sed -n -E 's/^engine_repo:[[:space:]]*"?([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)"?[[:space:]]*(#.*)?$/\1/p' config.yml)
+          sha=$(sed -n -E 's/^engine_sha:[[:space:]]*"?([0-9a-f]{40})"?[[:space:]]*(#.*)?$/\1/p' config.yml)
+          if [ -z "$repo" ] || [ -z "$sha" ]; then
+            echo "::error::config.yml must set engine_repo (owner/name) and engine_sha (full 40-char commit SHA)"
+            exit 1
+          fi
+          uv pip install --system "git+https://github.com/${repo}@${sha}"
+
+      - name: Compile profile
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.compile_profile && inputs.drill == 'none' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: python -m radar.main --compile-profile
+
+      - name: Run radar
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.drill == 'none' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: python -m radar.main
+
+      - name: Credential drill
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.drill != 'none' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          DRILL: ${{ inputs.drill }}
+        run: python -m radar.main --check-credentials --drill "$DRILL"
+
+      - name: Commit state
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A state/
+          if git diff --cached --quiet; then
+            echo "state/ unchanged; nothing to commit"
+            exit 0
+          fi
+          git commit -m "radar: state"
+          git pull --rebase
+          git push

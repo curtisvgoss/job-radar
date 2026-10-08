@@ -1,0 +1,11 @@
+[
+  {"id": "aaaa-1111", "text": "Machine Learning Engineer", "hostedUrl": "https://jobs.lever.co/globex/aaaa-1111",
+   "createdAt": 1759500000000, "workplaceType": "remote",
+   "categories": {"location": "San Francisco, CA", "commitment": "Full-time", "team": "ML"},
+   "descriptionPlain": "Train models.", "lists": [{"text": "Requirements", "content": "<li>PyTorch</li><li>Stats</li>"}],
+   "additionalPlain": "Benefits included.",
+   "salaryRange": {"min": 180000, "max": 220000, "currency": "USD", "interval": "per-year-salary"}},
+  {"id": "bbbb-2222", "text": "Director of Engineering", "hostedUrl": "https://jobs.lever.co/globex/bbbb-2222",
+   "createdAt": 1759600000000, "workplaceType": "onsite",
+   "categories": {"location": "New York, NY"}, "descriptionPlain": "Lead teams."}
+]

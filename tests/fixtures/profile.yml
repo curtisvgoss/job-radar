@@ -1,0 +1,11 @@
+identity: {name: Test Candidate}
+status: {situation: Testing}
+constraints: {locations: [new york], remote_ok: true}
+targets:
+  - {tier: 1, label: Data, patterns: [Data Engineer, analytics engineer]}
+  - {tier: 2, label: Broad, patterns: [engineer, analyst]}
+exclude: {seniority_words: [intern, director], title_substrings: [sales]}
+industries: {prefer: [software], avoid: []}
+skills: {core: [Python, SQL]}
+narrative: Test candidate. Data and ML engineering.
+scoring: {min_score: 60}

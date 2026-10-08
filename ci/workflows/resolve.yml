@@ -1,0 +1,50 @@
+# Instance workflow template: copy to .github/workflows/resolve.yml in your private instance repo.
+# Installs the engine at config.yml engine_sha and probes ATS boards. Uses no secrets.
+name: resolve
+
+on:
+  workflow_dispatch:
+    inputs:
+      companies:
+        description: 'Comma-separated company names, e.g. "Acme,Globex"'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: false
+
+      - name: Install engine at pinned commit
+        run: |
+          repo=$(sed -n -E 's/^engine_repo:[[:space:]]*"?([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)"?[[:space:]]*(#.*)?$/\1/p' config.yml)
+          sha=$(sed -n -E 's/^engine_sha:[[:space:]]*"?([0-9a-f]{40})"?[[:space:]]*(#.*)?$/\1/p' config.yml)
+          if [ -z "$repo" ] || [ -z "$sha" ]; then
+            echo "::error::config.yml must set engine_repo (owner/name) and engine_sha (full 40-char commit SHA)"
+            exit 1
+          fi
+          uv pip install --system "git+https://github.com/${repo}@${sha}"
+
+      - name: Resolve boards
+        env:
+          COMPANIES: ${{ inputs.companies }}
+        run: |
+          python -m tools.resolve "$COMPANIES" | tee hits.txt
+          {
+            echo "## ATS boards found"
+            echo
+            echo '```yaml'
+            if [ -s hits.txt ]; then cat hits.txt; else echo "# no boards found"; fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

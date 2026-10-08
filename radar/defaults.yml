@@ -1,0 +1,10 @@
+# Engine defaults. An instance's config.yml overrides any of these keys; unknown keys are rejected.
+# Relative paths resolve against the directory holding config.yml (the instance repo root).
+engine_repo: null          # owner/name of the engine repo; read by the instance workflow only
+engine_sha: null           # full 40-char engine commit; read by the instance workflow only
+profile_path: profile.yml
+companies_path: companies.yml   # used only when the profile has no companies list
+credentials_path: config/credentials.yml
+state_dir: state
+compile_model: claude-sonnet-5-5
+score_model: claude-haiku-5-5

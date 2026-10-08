@@ -1,0 +1,4 @@
+- {name: Acme, ats: greenhouse, slug: acme}
+- {name: Globex, ats: lever, slug: globex}
+- {name: Initech, ats: ashby, slug: initech}
+- {name: Broken Co, ats: greenhouse, slug: does-not-exist}

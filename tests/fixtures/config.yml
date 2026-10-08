@@ -1,0 +1,8 @@
+# Demo instance config for the engine repo:
+#   uv run python -m radar.main --config tests/fixtures/config.yml --dry-run --fixtures tests/fixtures
+profile_path: profile.yml
+companies_path: companies.yml
+credentials_path: credentials.yml
+state_dir: state
+compile_model: test-compile-model
+score_model: test-score-model

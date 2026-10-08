@@ -1,0 +1,56 @@
+{
+ "apiVersion": "1",
+ "jobs": [
+  {
+   "id": "c3d4-0001",
+   "title": "Analytics Engineer",
+   "location": "Austin, TX",
+   "secondaryLocations": [
+    {
+     "location": "New York, NY"
+    }
+   ],
+   "isRemote": false,
+   "workplaceType": "OnSite",
+   "jobUrl": "https://jobs.ashbyhq.com/initech/c3d4-0001",
+   "publishedAt": "2026-10-05T15:00:00.000+00:00",
+   "isListed": true,
+   "descriptionPlain": "dbt and SQL.",
+   "compensation": {
+    "compensationTierSummary": "$150K - $190K",
+    "scrapeableCompensationSalarySummary": "$150K - $190K"
+   }
+  },
+  {
+   "id": "c3d4-0002",
+   "title": "Platform Engineer",
+   "location": "Berlin",
+   "isRemote": true,
+   "jobUrl": "https://jobs.ashbyhq.com/initech/c3d4-0002",
+   "publishedAt": "2026-10-06T15:00:00Z",
+   "isListed": true,
+   "descriptionPlain": "Kubernetes.",
+   "workplaceType": "Hybrid"
+  },
+  {
+   "id": "c3d4-0003",
+   "title": "Hidden Engineer",
+   "location": "New York",
+   "isRemote": true,
+   "jobUrl": "https://jobs.ashbyhq.com/initech/c3d4-0003",
+   "publishedAt": "2026-10-06T15:00:00Z",
+   "isListed": false,
+   "descriptionPlain": "Unlisted."
+  },
+  {
+   "id": "c3d4-0004",
+   "title": "Remote Account Manager",
+   "location": "Denver",
+   "isRemote": true,
+   "jobUrl": "https://jobs.ashbyhq.com/initech/c3d4-0004",
+   "publishedAt": "2026-09-01T15:00:00Z",
+   "isListed": true,
+   "descriptionPlain": "No workplaceType field."
+  }
+ ]
+}

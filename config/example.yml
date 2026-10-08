@@ -1,0 +1,62 @@
+# Example profile.yml for a fictional candidate. Copy to your instance repo as profile.yml,
+# replace every value, then run: python -m radar.main --compile-profile
+# Unknown keys are rejected; keys marked (optional) may be omitted.
+
+identity:
+  name: Alex Example
+  headline: Data engineer, 6 years, batch + streaming pipelines   # (optional)
+  location: Denver, CO                                            # (optional)
+  links: [https://example.com/alex]                               # (optional)
+
+status:
+  situation: Employed, open to the right role
+  notes: Two weeks' notice                                        # (optional)
+
+constraints:
+  locations: [denver, boulder, colorado]   # case-insensitive substrings of a posting's location; [] = any
+  remote_ok: true                          # remote postings pass the location rule
+  relocate: false                          # (optional)
+  comp_floor: 150000                       # (optional) USD base
+  notes: No more than 2 office days a week # (optional)
+
+# Titles must contain at least one pattern (case-insensitive substring). Lower tier = more wanted;
+# a posting takes the best tier it matches.
+targets:
+  - tier: 1
+    label: Data platform
+    patterns: [data engineer, data platform, analytics engineer]
+  - tier: 2
+    label: ML infrastructure
+    patterns: [ml engineer, machine learning engineer, mlops]
+  - tier: 3
+    label: Backend, data-heavy
+    patterns: [backend engineer, software engineer, data]
+
+exclude:
+  seniority_words: [intern, junior, principal, director, vp, head]   # whole words: "intern" keeps "Internal"
+  title_substrings: [sales, solutions engineer, support]             # plain substrings
+
+industries:
+  prefer: [developer tools, climate, healthcare]
+  avoid: [gambling, defense]
+
+skills:
+  core: [Python, SQL, Spark, Airflow, dbt, Kafka]
+  familiar: [Go, Terraform, Kubernetes]                           # (optional)
+
+narrative: >
+  Six years building data platforms: batch ELT on Airflow and dbt, then streaming on Kafka and
+  Flink at a mid-size marketplace. Strongest at turning messy pipelines into reliable, observable
+  systems with clear ownership. Wants a senior IC role on a small platform team with real
+  ownership; not interested in pure BI/reporting or people management. Denver area or remote (US).
+
+scoring:
+  min_score: 60                                                   # (optional) digest threshold, default 60
+  priorities: [ownership of a platform, streaming, small team]    # (optional)
+  deal_breakers: [on-site 5 days, unpaid take-home over 4 hours]  # (optional)
+
+# (optional) When present, replaces companies.yml. Find slugs with: python -m tools.resolve "Acme,Globex"
+companies:
+  - {name: Example Greenhouse Co, ats: greenhouse, slug: example-greenhouse}
+  - {name: Example Lever Co, ats: lever, slug: example-lever}
+  - {name: Example Ashby Co, ats: ashby, slug: example-ashby}
