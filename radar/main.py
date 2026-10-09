@@ -107,10 +107,10 @@ def compile_cmd(args, cfg: config.Config, profile: dict, alerts: Alerts, client_
             alerts.alert(CredentialAlert(creds.API_KEY_ID, "credits", e.status_code,
                                          "Profile compile call refused: credit balance too low"))
             return EXIT_ALERT
-        log.error("compile failed: HTTP %s", e.status_code)
+        log.error("compile failed: %s", creds.api_error_detail(e))
         return 1
     except anthropic.APIStatusError as e:
-        log.error("compile failed: HTTP %s", e.status_code)
+        log.error("compile failed: %s", creds.api_error_detail(e))
         return 1
     except anthropic.APIConnectionError as e:
         log.error("compile failed: %s", type(e).__name__)

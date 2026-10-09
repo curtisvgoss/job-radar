@@ -18,9 +18,9 @@ COMPILED = {
 }
 
 
-def api_error(cls, status, message="error"):
+def api_error(cls, status, message="error", body=None):
     resp = httpx.Response(status, request=httpx.Request("POST", "https://api.anthropic.com/v1/x"))
-    return cls(message, response=resp, body=None)
+    return cls(message, response=resp, body=body)
 
 
 class FakeClient:

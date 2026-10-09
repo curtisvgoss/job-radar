@@ -36,8 +36,10 @@ daily:  probe key ─► hash check ─► fetch boards ─► filter (titles ·
   Daily scoring uses that brief as the system prompt for a small model. The brief is stamped with
   the profile's sha256; a scoring run against a changed profile exits 3 rather than score with a
   stale brief.
-- **Structured output only.** Both model calls are forced to a single tool (`compiled_profile`,
-  `record_score`) and the tool input is validated; anything malformed is discarded.
+- **Structured output only.** Each model call offers a single tool (`compiled_profile`,
+  `record_score`) and the tool input is validated; anything malformed is discarded. Scoring forces
+  `record_score`; the compile call uses `tool_choice: auto` steered by its prompt (retried once if no
+  call is made), because current Sonnet/Opus models reject forced tool use with a 400.
 - **Untrusted input stays data.** Posting text is truncated to 6,000 chars and wrapped in
   `<posting>…</posting>`; embedded `<posting>` tags are neutralized and the system prompt states
   that the contents are never instructions.
@@ -53,7 +55,7 @@ daily:  probe key ─► hash check ─► fetch boards ─► filter (titles ·
 |---|---|
 | `radar/config.py` | `config.yml` over packaged `radar/defaults.yml`; unknown keys rejected |
 | `radar/profile.py` | profile schema validation, filter-rule derivation, content hash |
-| `radar/compiler.py` | `--compile-profile`: forced `compiled_profile` tool call |
+| `radar/compiler.py` | `--compile-profile`: one `compiled_profile` tool call, request checked for known 400 causes |
 | `radar/fetch.py` | one adapter per ATS → `{uid, company, title, location, remote, url, posted_at, comp, text}` |
 | `radar/filter.py` | deterministic filter; annotates each kept posting with its best target tier |
 | `radar/score.py` | one forced `record_score` call per posting |
