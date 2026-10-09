@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import subprocess
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
@@ -48,6 +49,21 @@ def load(path: str | Path) -> list[dict]:
 
 def is_credit_error(e: Exception) -> bool:
     return "credit balance" in str(e).lower()
+
+
+_KEYLIKE = re.compile(r"sk-ant-[\w-]+")
+MAX_DETAIL = 500
+
+
+def api_error_detail(e: anthropic.APIStatusError) -> str:
+    """'HTTP <status> <error type>: <message>' from the API error body. Never headers; key-like strings redacted."""
+    err = e.body.get("error") if isinstance(e.body, dict) else None
+    if isinstance(err, dict):
+        kind, message = err.get("type") or "error", err.get("message") or ""
+    else:
+        kind, message = "error", getattr(e, "message", "") or ""
+    message = _KEYLIKE.sub("[redacted]", str(message))[:MAX_DETAIL]
+    return f"HTTP {e.status_code} {kind}: {message}" if message else f"HTTP {e.status_code} {kind}"
 
 
 def utc_today() -> date:
@@ -92,7 +108,7 @@ def probe(api_key: str | None, client_factory=anthropic.Anthropic) -> ProbeResul
         return ProbeResult(CredentialAlert(API_KEY_ID, "forbidden", e.status_code,
                                            "Anthropic API probe (GET /v1/models) was refused: permission_error"), False)
     except anthropic.APIStatusError as e:
-        log.warning("credential probe inconclusive: HTTP %s; continuing", e.status_code)
+        log.warning("credential probe inconclusive: %s; continuing", api_error_detail(e))
         return ProbeResult(None, False)
     except anthropic.APIConnectionError as e:
         log.warning("credential probe inconclusive: %s; continuing", type(e).__name__)

@@ -7,7 +7,7 @@ import re
 
 import anthropic
 
-from radar.creds import API_KEY_ID, CredentialAlert, is_credit_error
+from radar.creds import API_KEY_ID, CredentialAlert, api_error_detail, is_credit_error
 
 log = logging.getLogger(__name__)
 
@@ -85,10 +85,10 @@ def score_one(client, compiled: dict, model: str, p: dict) -> dict | None:
         if is_credit_error(e):
             raise CredentialAlert(API_KEY_ID, "credits", e.status_code,
                                   "Messages API call refused: credit balance too low") from None
-        log.warning("scoring failed for %s: HTTP %s", p["uid"], e.status_code)
+        log.warning("scoring failed for %s: %s", p["uid"], api_error_detail(e))
         return None
     except anthropic.APIStatusError as e:
-        log.warning("scoring failed for %s: HTTP %s", p["uid"], e.status_code)
+        log.warning("scoring failed for %s: %s", p["uid"], api_error_detail(e))
         return None
     except anthropic.APIConnectionError as e:
         log.warning("scoring failed for %s: %s", p["uid"], type(e).__name__)
